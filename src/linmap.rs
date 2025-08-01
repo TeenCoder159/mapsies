@@ -1,5 +1,7 @@
 use std::error::Error;
 
+use crate::map::Map;
+
 #[derive(Debug)]
 /// Linear map:
 pub struct LinearMap<T, S> {
@@ -7,37 +9,37 @@ pub struct LinearMap<T, S> {
     pub value: Vec<S>,
 }
 
-impl<T, S> LinearMap<T, S> {
-    pub fn new() -> Self {
+impl<T, S> Map<T, S> for LinearMap<T, S> {
+    fn new() -> Self {
         Self {
             key: vec![],
             value: vec![],
         }
     }
 
-    pub fn add(&mut self, key: T, val: S) -> Result<(), Box<dyn std::error::Error>>
+    fn add(&mut self, key: T, val: S)
     where
         T: PartialEq,
+        S: Copy,
     {
         if self.key.contains(&key) {
-            return Err("Key already exists".into());
+            return;
         }
 
         self.key.push(key);
         self.value.push(val);
-
-        Ok(())
     }
 
-    pub fn get(&self, key: &T) -> Option<&S>
+    fn get(&self, key: T) -> Option<S>
     where
         T: PartialEq,
+        S: Copy,
     {
         let mut i = 0;
         let mut found = false;
 
         for val in &self.key {
-            if val == key {
+            if *val == key {
                 found = true;
                 break;
             }
@@ -45,13 +47,13 @@ impl<T, S> LinearMap<T, S> {
         }
 
         if found {
-            Some(self.value.get(i).unwrap())
+            Some(*self.value.get(i).unwrap())
         } else {
             None
         }
     }
 
-    pub fn remove(&mut self, key: T) -> Result<(), Box<dyn Error>>
+    fn remove(&mut self, key: T) -> Result<(), Box<dyn Error>>
     where
         T: PartialEq,
     {
@@ -69,7 +71,7 @@ impl<T, S> LinearMap<T, S> {
         }
     }
 
-    pub fn remove_index(&mut self, index: usize) {
+    fn remove_index(&mut self, index: usize) {
         self.key.remove(index);
         self.value.remove(index);
     }
